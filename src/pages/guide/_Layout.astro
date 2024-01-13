@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  post: CollectionEntry<"guides">["data"];
+};
+const { post } = Astro.props;
+const { title } = post;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guide | {title}</title>
+  </head>
+  <body>
+    <div class="mx-auto max-w-screen-md p-4">
+      <h1 class="text-3xl font-bold">{title}</h1>
+      <article class="max-w-screen-md mb-8 mt-4">
+        <div
+          class:list={[
+            "prose max-w-screen-md",
+            "prose-h3:uppercase prose-h3:text-lg",
+            "prose-p:leading-[1.6]",
+            "prose-hr:border-slate-400 prose-hr:my-5",
+            "prose-blockquote:font-normal prose-blockquote:border-slate-400",
+            "prose-a:text-blue-500",
+            "prose-li:my-0",
+            "[&_p~ul]:-mt-[1rem]",
+            "prose-pre:my-0 prose-pre:rounded-t-none",
+            "[&_pre_code]:pr-4",
+            "[&_.code-block-wrapper]:rounded-b-lg",
+            "[&_.code-block-header]:flex [&_.code-block-header]:justify-between [&_.code-block-header]:items-center [&_.code-block-header]:p-1 [&_.code-block-header]:pl-2 [&_.code-block-header]:bg-slate-300 [&_.code-block-header]:rounded-t-md",
+            "[&_.code-block-header>p]:text-xs [&_.code-block-header>p]:mb-0 [&_.code-block-header>p]:mt-0.5",
+            "[&_.copy-button]:bg-slate-500 [&_.copy-button]:text-white [&_.copy-button]:text-sm [&_.copy-button]:py-0.5 [&_.copy-button]:px-3 [&_.copy-button]:rounded [&_.copy-button]:right-2 [&_.copy-button]:top-2",
+          ]}>
+          <slot />
+        </div>
+      </article>
+    </div>
+    <script is:inline>
+      function copyCode(button) {
+        const codeBlock = button.parentElement.nextElementSibling;
+        navigator.clipboard.writeText(codeBlock.textContent);
+        button.innerText = "Copied!";
+        setTimeout(() => (button.innerText = "Copy"), 1000);
+      }
+    </script>
+  </body>
+</html>

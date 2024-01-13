@@ -1,0 +1,34 @@
+---
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("guides");
+---
+
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Guide</title>
+  </head>
+  <body>
+    <div class="max-w-screen-md mx-auto p-6">
+      <h1 class="text-xl font-bold mb-2">GUIDE:</h1>
+      <ul class="list-disc list-inside marker:text-slate-400">
+        {
+          posts.map((p) => (
+            <>
+              <li class="my-1">
+                <a class="hover:underline hover:text-blue-500" href={`/guide/${p.slug}/`}>
+                  {p.data.title}
+                </a>
+              </li>
+            </>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="fixed bottom-0 w-full text-center pb-1 text-neutral-600">Quarto Raggio</div>
+  </body>
+</html>
