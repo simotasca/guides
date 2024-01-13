@@ -9,7 +9,7 @@ const { title } = post;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,6 +21,7 @@ const { title } = post;
       <article class="max-w-screen-md mb-8 mt-4">
         <div
           class:list={[
+            "[&>*]:scroll-m-4",
             "prose max-w-screen-md",
             "prose-h3:uppercase prose-h3:text-lg",
             "prose-p:leading-[1.6]",
@@ -28,6 +29,9 @@ const { title } = post;
             "prose-blockquote:font-normal prose-blockquote:border-slate-400",
             "prose-a:text-blue-500",
             "prose-li:my-0",
+            "[&_.toc-level:not(.toc-level-1)]:mt-0 [&_.toc-level:not(.toc-level-1)]:mb-2",
+            "[&_.toc-level-1>.toc-item]:mb-2 [&_.toc-level-1>.toc-item>a]:text-lg  [&_.toc-level-1>.toc-item>a]:font-semibold",
+            "[&_.toc-item_a]:text-neutral-800",
             "[&_p~ul]:-mt-[1rem]",
             "prose-pre:my-0 prose-pre:rounded-t-none",
             "[&_pre_code]:pr-4",
@@ -35,11 +39,34 @@ const { title } = post;
             "[&_.code-block-header]:flex [&_.code-block-header]:justify-between [&_.code-block-header]:items-center [&_.code-block-header]:p-1 [&_.code-block-header]:pl-2 [&_.code-block-header]:bg-slate-300 [&_.code-block-header]:rounded-t-md",
             "[&_.code-block-header>p]:text-xs [&_.code-block-header>p]:mb-0 [&_.code-block-header>p]:mt-0.5",
             "[&_.copy-button]:bg-slate-500 [&_.copy-button]:text-white [&_.copy-button]:text-sm [&_.copy-button]:py-0.5 [&_.copy-button]:px-3 [&_.copy-button]:rounded [&_.copy-button]:right-2 [&_.copy-button]:top-2",
+            '[&_[class^="toc-level-"]:not(.toc-level-1)]:hidden',
           ]}>
           <slot />
         </div>
       </article>
+      <div class="fixed bottom-2 w-full left-0">
+        <div class="w-full max-w-screen-md mx-auto px-2 flex justify-end">
+          <button
+            id="scroll-top"
+            onclick="window.scrollTo({top:0, behavior: 'smooth'})"
+            class="ml-auto mr-0 w-fit rounded-full bg-slate-700 text-white uppercase text-sm font-bold aspect-square p-2 scale-0 translate-y-8 origin-center transition-transform"
+            >top</button
+          >
+        </div>
+      </div>
     </div>
+    <script>
+      // show / hide back to top button
+      const backTop = document.querySelector("button#scroll-top");
+      const classes = ["scale-0", "translate-y-8"];
+      window.addEventListener("scroll", () => {
+        if (window.scrollY < window.innerHeight) {
+          backTop?.classList.add(...classes);
+        } else {
+          backTop?.classList.remove(...classes);
+        }
+      });
+    </script>
     <script is:inline>
       function copyCode(button) {
         const codeBlock = button.parentElement.nextElementSibling;

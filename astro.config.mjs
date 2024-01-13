@@ -3,6 +3,8 @@ import mdx from "@astrojs/mdx";
 import tailwind from "@astrojs/tailwind";
 import remarkBreaks from "remark-breaks";
 import rehypeToc from "rehype-toc";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { visit } from "unist-util-visit";
 
 // https://astro.build/config
@@ -14,7 +16,12 @@ export default defineConfig({
       langs: ["bash"],
     },
     remarkPlugins: [remarkBreaks],
-    rehypePlugins: [rehypeCodeCopyButton, [rehypeToc, { headings: ["h2", "h3"] }]],
+    rehypePlugins: [
+      rehypeCodeCopyButton,
+      rehypeSlug,
+      [rehypeAutolinkHeadings, { behavior: "append" }],
+      [rehypeToc, { headings: ["h2", "h3"] }],
+    ],
   },
 });
 
