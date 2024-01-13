@@ -14,24 +14,44 @@ const { title } = post;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guide | {title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <style is:inline>
+      body {
+        counter-reset: section;
+      }
+
+      h2::before {
+        counter-increment: section;
+        content: counter(section) ". ";
+        color: #8da3be;
+      }
+    </style>
   </head>
-  <body class="bg-neutral-800 text-white">
+  <body class="bg-neutral-900 text-white font-['Roboto',sans-serif]">
     <div class="mx-auto max-w-screen-md p-4">
-      <h1 class="text-3xl font-bold">{title}</h1>
+      <h1 class="text-3xl font-semibold text-[#c2d2e6]">{title}</h1>
       <article class="max-w-screen-md mb-8 mt-4">
         <div
           class:list={[
-            "[&>*]:scroll-m-4 [&>*]:text-white",
+            "[&>*]:scroll-m-4 text-white",
             "prose-strong:text-slate-200",
             "prose max-w-screen-md",
-            "prose-h3:uppercase prose-h3:text-lg",
+            "prose-h2:text-white",
+            "prose-h3:text-white prose-h3:uppercase prose-h3:text-lg",
+            "prose-h4:text-white",
+            "prose-h5:text-white",
             "prose-p:leading-[1.6]",
             "prose-hr:border-slate-400 prose-hr:my-5",
             "prose-blockquote:font-normal prose-blockquote:border-slate-400",
             "prose-a:text-blue-400",
             "prose-li:my-0",
             "[&_.toc-level:not(.toc-level-1)]:mt-0 [&_.toc-level:not(.toc-level-1)]:mb-2",
-            "[&_.toc-level-1>.toc-item]:mb-2 [&_.toc-level-1>.toc-item>a]:text-lg  [&_.toc-level-1>.toc-item>a]:font-semibold",
+            "[&_.toc-level-1>.toc-item]:mb-2 [&_.toc-level-1>.toc-item>a]:text-lg  [&_.toc-level-1>.toc-item>a]:font-medium",
             "[&_.toc-item_a]:text-neutral-100 [&_.toc-item:hover>a]:text-blue-400",
             "[&_.toc-item]:marker:text-neutral-300",
             "[&_p~ul]:-mt-[1rem]",
@@ -47,16 +67,17 @@ const { title } = post;
         </div>
       </article>
       <div class="fixed bottom-2 w-full left-0">
-        <div class="w-full max-w-screen-md mx-auto px-2 flex justify-end">
+        <div class="w-full max-w-screen-md mx-auto flex justify-end">
           <button
             id="scroll-top"
             onclick="window.scrollTo({top:0, behavior: 'smooth'})"
-            class="ml-auto mr-0 w-fit rounded-full bg-slate-700 text-white uppercase text-sm font-bold aspect-square p-2 scale-0 translate-y-8 origin-center transition-transform"
-            >top</button
-          >
+            class="mr-2 w-fit rounded-full bg-slate-700 text-white uppercase text-sm font-bold aspect-square p-2 scale-0 translate-y-8 origin-center transition-transform">
+            top
+          </button>
         </div>
       </div>
     </div>
+
     <script>
       // show / hide back to top button
       const backTop = document.querySelector("button#scroll-top");

@@ -12,12 +12,7 @@ export default defineConfig({
   integrations: [mdx(), tailwind()],
   markdown: {
     remarkPlugins: [remarkBreaks],
-    rehypePlugins: [
-      rehypeCodeCopyButton,
-      rehypeSlug,
-      [rehypeAutolinkHeadings, { behavior: "append" }],
-      [rehypeToc, { headings: ["h2", "h3"] }],
-    ],
+    rehypePlugins: [rehypeCodeCopyButton, rehypeSlug, rehypeAutolinkHeadings, [rehypeToc, { headings: ["h2", "h3"] }]],
   },
 });
 

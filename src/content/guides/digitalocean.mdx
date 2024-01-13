@@ -10,52 +10,57 @@ import imgCreateNewDroplet from "@/assets/digitalocean/create-new-droplet.jpg";
 ## Alcuni comandi utili
 
 Creazione di un file:
-
 ```bash
 touch /path/to/file
 ```
 
 Eliminazione di un file:
-
 ```bash
 rm /path/to/file
 ```
 
 Eliminazione di una cartella:
-
 ```bash
 rm -rf /path/to/folder
 ```
 
 Elencare un file in una cartella:
-
 ```bash
 ls -la /folder/to/inspect
 ```
 
 Creazione di un archivio tar:
-
 ```bash
-tar -czf nome_archivio.tar.gz file1 file2 file3
+# -c(ompress) -z (gzip) -v(erbose) -f(ile name)
+tar -czvf nome_archivio.tar.gz file1 file2 file3
 ```
 
 Estrazione di un archivio tar:
-
 ```bash
-tar -xzf nome_archivio.tar.gz
+# -x (extract) -z (gzip) -v(erbose) -f(ile name)
+tar -xzvf nome_archivio.tar.gz
 ```
 
-per editare un file con nano:
-con `ctrl+s` si salva e con `ctrl+x` si chiude l'editor
-
+Per editare un file dal terminale:
 ```bash
+# con ctrl+s si salva il file e con ctrl+x si chiude l'editor
 nano nome_file
 ```
 
 Per chiudere un terminale (o uscire da una sessione ssh)
-
 ```bash
 exit
+```
+
+Per visualizzare tutte le porte attive di un ip remoto
+```bash
+nmap -p 0-65535 indirizzo_ip
+```
+
+nmap va installato con:
+```bash
+sudo apt update
+sudo apt install nmap
 ```
 
 ## Creazione droplet
@@ -197,7 +202,7 @@ sudo apt update
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 ```
 
-### Docker:
+### Docker
 
 per installare docker:
 
@@ -229,7 +234,7 @@ per conferma basta provare un comando docker senza sudo (come `docker ps`), e pe
 groups
 ```
 
-### Compose:
+### Compose
 
 scaricare la repository
 
@@ -250,7 +255,7 @@ verifica:
 docker compose version
 ```
 
-### Compatibilità UFW:
+### Compatibilità UFW
 
 #### Problema:
 
@@ -296,6 +301,8 @@ Altre risorse per comprendere il problema (ma con soluzioni non realmente funzio
 Dovrei provare a mettere nginx come servizio docker, come spiegato in <a href="https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose" target="_blank">Questa Guida</a> di Digital Ocean...
 
 Intanto per installare nginx uso <a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04" target="_blank">Questa guida</a> e per mettere certbot uso <a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04" target="_blank">Questa</a>.
+
+Considerando i problemi con docker e il firewall meglio la soluzione attuale.
 
 ### Installare Nginx:
 
@@ -419,7 +426,9 @@ http {
 
 In questo caso ho impostato 1GB.
 
-## Creazione nuovo dominio (serve davvero?)
+## Configurazione DNS
+
+### Aggiungere nuovo dominio
 
 Pannello di controllo, click sul tasto **Create**, Domains/DNS.
 
@@ -428,31 +437,33 @@ Il dominio non deve contenere il sottodominio (www)
 
 <Image src={imgAddDomain} alt="aggiungere un dominio" />
 
-## Configurazione DNS
+### Record DNS
 
 Per creare i record DNS premere sul dominio creato e seguire <a href="https://docs.digitalocean.com/products/networking/dns/how-to/manage-records/" target="_blank">Questa Guida</a>
 
 Servono:
 
-- un A record con your_domain che punta all'IP pubblico del server.
-- An A record con www.your_domain che punta all'IP pubblico del server.
-- A volte servono anche i record AAAA per i sottodomini
+- un A record con `nome_dominio` che punta all'IP pubblico del server.
+- An A record per ogni sottodominio (es. `www.nome_dominio`) che punta all'IP pubblico del server.
+- A volte servono anche i record AAAA (per ipv6)
 
 I record A sono dei record che servono a far puntare un dominio a un ip.
 
 Vedere <a href="https://docs.digitalocean.com/products/networking/dns/" target="_blank">Questa Guida</a> di Digital Ocean
 
-Sul provider del proprio dominio inserire i seguenti record NS:
+Sul provider del proprio dominio configurare i seguenti record NS (name server):
 
 - ns1.digitalocean.com
 - ns2.digitalocean.com
 - ns3.digitalocean.com
 
+A volte non si tratta di record NS ma dei name server di default.
+
 ## Certificati HTTPS
 
 I certificati https sono solitamente a pagamento e vanno aggiornati periodicamente. Per averli gratis e gestire il rinnovo si usa Certbot
 
-### Installazione:
+### Installazione
 
 Per installare certbot e il suo plugin per nginx:
 
