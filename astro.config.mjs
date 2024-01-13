@@ -11,10 +11,6 @@ import { visit } from "unist-util-visit";
 export default defineConfig({
   integrations: [mdx(), tailwind()],
   markdown: {
-    syntaxHighlight: "shiki",
-    shikiConfig: {
-      langs: ["bash"],
-    },
     remarkPlugins: [remarkBreaks],
     rehypePlugins: [
       rehypeCodeCopyButton,

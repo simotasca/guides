@@ -12,7 +12,7 @@ const posts = await getCollection("guides");
     <meta name="generator" content={Astro.generator} />
     <title>Guide</title>
   </head>
-  <body>
+  <body class="bg-neutral-800 text-white">
     <div class="max-w-screen-md mx-auto p-6">
       <h1 class="text-xl font-bold mb-2">GUIDE:</h1>
       <ul class="list-disc list-inside marker:text-slate-400">
@@ -20,7 +20,7 @@ const posts = await getCollection("guides");
           posts.map((p) => (
             <>
               <li class="my-1">
-                <a class="hover:underline hover:text-blue-500" href={`/guide/${p.slug}/`}>
+                <a class="hover:underline hover:text-blue-400" href={`/guide/${p.slug}/`}>
                   {p.data.title}
                 </a>
               </li>

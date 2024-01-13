@@ -15,28 +15,30 @@ const { title } = post;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guide | {title}</title>
   </head>
-  <body>
+  <body class="bg-neutral-800 text-white">
     <div class="mx-auto max-w-screen-md p-4">
       <h1 class="text-3xl font-bold">{title}</h1>
       <article class="max-w-screen-md mb-8 mt-4">
         <div
           class:list={[
-            "[&>*]:scroll-m-4",
+            "[&>*]:scroll-m-4 [&>*]:text-white",
+            "prose-strong:text-slate-200",
             "prose max-w-screen-md",
             "prose-h3:uppercase prose-h3:text-lg",
             "prose-p:leading-[1.6]",
             "prose-hr:border-slate-400 prose-hr:my-5",
             "prose-blockquote:font-normal prose-blockquote:border-slate-400",
-            "prose-a:text-blue-500",
+            "prose-a:text-blue-400",
             "prose-li:my-0",
             "[&_.toc-level:not(.toc-level-1)]:mt-0 [&_.toc-level:not(.toc-level-1)]:mb-2",
             "[&_.toc-level-1>.toc-item]:mb-2 [&_.toc-level-1>.toc-item>a]:text-lg  [&_.toc-level-1>.toc-item>a]:font-semibold",
-            "[&_.toc-item_a]:text-neutral-800",
+            "[&_.toc-item_a]:text-neutral-100 [&_.toc-item:hover>a]:text-blue-400",
+            "[&_.toc-item]:marker:text-neutral-300",
             "[&_p~ul]:-mt-[1rem]",
             "prose-pre:my-0 prose-pre:rounded-t-none",
-            "[&_pre_code]:pr-4",
-            "[&_.code-block-wrapper]:rounded-b-lg",
-            "[&_.code-block-header]:flex [&_.code-block-header]:justify-between [&_.code-block-header]:items-center [&_.code-block-header]:p-1 [&_.code-block-header]:pl-2 [&_.code-block-header]:bg-slate-300 [&_.code-block-header]:rounded-t-md",
+            "[&_pre_code]:pr-4 [&_code]:text-slate-400",
+            "[&_.code-block-wrapper]:rounded-b-lg [&_.code-block-wrapper]:rounded-lg [&_.code-block-wrapper]:border [&_.code-block-wrapper]:border-slate-500",
+            "[&_.code-block-header]:flex [&_.code-block-header]:justify-between [&_.code-block-header]:items-center [&_.code-block-header]:p-1 [&_.code-block-header]:pl-2 [&_.code-block-header]:bg-slate-300 [&_.code-block-header]:text-slate-800 [&_.code-block-header]:rounded-t-md",
             "[&_.code-block-header>p]:text-xs [&_.code-block-header>p]:mb-0 [&_.code-block-header>p]:mt-0.5",
             "[&_.copy-button]:bg-slate-500 [&_.copy-button]:text-white [&_.copy-button]:text-sm [&_.copy-button]:py-0.5 [&_.copy-button]:px-3 [&_.copy-button]:rounded [&_.copy-button]:right-2 [&_.copy-button]:top-2",
             '[&_[class^="toc-level-"]:not(.toc-level-1)]:hidden',
