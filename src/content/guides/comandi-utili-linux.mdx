@@ -1,0 +1,89 @@
+---
+title: "Comandi utili per Linux bash"
+---
+
+## File e cartelle
+
+### Creazione di un file
+```bash
+touch /path/to/file
+```
+
+### Eliminazione di un file
+```bash
+rm /path/to/file
+```
+
+### Eliminazione di una cartella
+```bash
+rm -rf /path/to/folder
+```
+
+### Elencare i file in una cartella
+```bash
+ls -la /path/to/folder
+```
+
+### Editare un file dal terminale
+```bash
+# con ctrl+s si salva il file e con ctrl+x si chiude l'editor
+nano /path/to/file
+```
+
+### Chiudere un terminale (o uscire da una sessione ssh)
+```bash
+exit
+```
+
+## Archivi compressi:
+
+### Creazione di un archivio tar
+```bash
+# -c(ompress) -z (gzip) -v(erbose) -f(ile name)
+tar -czvf archive_name.tar.gz ./file1 ./file2 ./file3
+```
+
+### Estrazione di un archivio tar
+```bash
+# -x (extract) -z (gzip) -v(erbose) -f(ile name)
+tar -xzvf archive_name.tar.gz
+```
+
+## ssh
+
+### Connessione terminale remoto
+```bash
+ssh user@ip_address
+```
+
+### Esecuzione comando su remoto
+```bash
+ssh user@ip_address command
+```
+
+### Copia file
+
+#### Da locale a remoto
+```bash
+scp /path/to/file user@ip_address:/remote/path/to/folder
+```
+
+#### Da remoto a locale
+```bash
+scp user@ip_address:/remote/path/to/folder /path/to/file
+```
+
+La copia da remoto a remoto non è supportata
+
+## Ispezione server
+
+### Installazione nmap
+```bash
+sudo apt update
+sudo apt install nmap
+```
+
+### Visualizzare tutte le porte attive di un ip remoto
+```bash
+nmap -p 0-65535 indirizzo_ip
+```
