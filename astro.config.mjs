@@ -9,6 +9,7 @@ import { visit } from "unist-util-visit";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://guides-quarto-raggio.onrender.com/",
   integrations: [mdx(), tailwind()],
   markdown: {
     remarkPlugins: [remarkBreaks],

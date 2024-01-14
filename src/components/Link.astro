@@ -1,0 +1,19 @@
+---
+interface Props {
+  href: string;
+}
+const { href } = Astro.props;
+
+let hrefOk = href;
+
+if (!hrefOk.startsWith("#") && !hrefOk.startsWith("http")) {
+  if (!hrefOk.startsWith("/")) {
+    hrefOk = "/" + hrefOk;
+  }
+  hrefOk = Astro.site?.origin + hrefOk;
+}
+---
+
+<a href={hrefOk} target="_blank">
+  {Astro.slots.has("default") ? <><slot /></> : hrefOk}
+</a>

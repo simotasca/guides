@@ -39,16 +39,17 @@ const { title } = post;
         <div
           class:list={[
             "[&>*]:scroll-m-4 text-white",
-            "prose-strong:text-slate-200",
+            "prose-strong:text-slate-300",
             "prose max-w-screen-md",
             "prose-h2:text-white",
             "prose-h3:text-white prose-h3:uppercase prose-h3:text-lg",
             "prose-h4:text-white",
             "prose-h5:text-white",
+            "prose-blockquote:text-neutral-300",
             "prose-p:leading-[1.6]",
             "prose-hr:border-slate-400 prose-hr:my-5",
             "prose-blockquote:font-normal prose-blockquote:border-slate-400",
-            "prose-a:text-blue-400",
+            "prose-a:text-blue-400 prose-a:break-words ",
             "prose-li:my-0",
             "[&_.toc-level:not(.toc-level-1)]:mt-0 [&_.toc-level:not(.toc-level-1)]:mb-2",
             "[&_.toc-level-1>.toc-item]:mb-2 [&_.toc-level-1>.toc-item>a]:text-lg  [&_.toc-level-1>.toc-item>a]:font-medium",
@@ -71,7 +72,7 @@ const { title } = post;
           <button
             id="scroll-top"
             onclick="window.scrollTo({top:0, behavior: 'smooth'})"
-            class="mr-2 w-fit rounded-full bg-slate-700 text-white uppercase text-sm font-bold aspect-square p-2 scale-0 translate-y-8 origin-center transition-transform">
+            class="mr-2 w-fit rounded-full bg-slate-700 text-white uppercase text-sm font-bold aspect-square p-2 pb-1 scale-0 translate-y-8 origin-center transition-transform">
             top
           </button>
         </div>

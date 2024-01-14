@@ -3,65 +3,14 @@ title: "Setup Droplet Ubuntu su DigitalOcean con Docker, Nginx ed SSL (https)"
 ---
 
 import { Image } from "astro:assets";
+import Link from "@/components/Link.astro";
 import imgAddDomain from "@/assets/digitalocean/domain-added.png";
 import imgNginxInstalled from "@/assets/digitalocean/nginx-default-working.jpg";
 import imgCreateNewDroplet from "@/assets/digitalocean/create-new-droplet.jpg";
 
-## Alcuni comandi utili
+## Intro
 
-Creazione di un file:
-```bash
-touch /path/to/file
-```
-
-Eliminazione di un file:
-```bash
-rm /path/to/file
-```
-
-Eliminazione di una cartella:
-```bash
-rm -rf /path/to/folder
-```
-
-Elencare un file in una cartella:
-```bash
-ls -la /folder/to/inspect
-```
-
-Creazione di un archivio tar:
-```bash
-# -c(ompress) -z (gzip) -v(erbose) -f(ile name)
-tar -czvf nome_archivio.tar.gz file1 file2 file3
-```
-
-Estrazione di un archivio tar:
-```bash
-# -x (extract) -z (gzip) -v(erbose) -f(ile name)
-tar -xzvf nome_archivio.tar.gz
-```
-
-Per editare un file dal terminale:
-```bash
-# con ctrl+s si salva il file e con ctrl+x si chiude l'editor
-nano nome_file
-```
-
-Per chiudere un terminale (o uscire da una sessione ssh)
-```bash
-exit
-```
-
-Per visualizzare tutte le porte attive di un ip remoto
-```bash
-nmap -p 0-65535 indirizzo_ip
-```
-
-nmap va installato con:
-```bash
-sudo apt update
-sudo apt install nmap
-```
+Eventuali comandi utili per seguire la guida si trovano in <Link href="/guide/comandi-utili-linux/" />
 
 ## Creazione droplet
 
@@ -81,12 +30,12 @@ Seguire dunque i seguenti passaggi:
 Completata la creazione della droplet si può accedere con ssh da un terminale.
 
 ```bash
-ssh root@your_droplet_ip
+ssh root@ip_droplet
 ```
 
 ## Creazione utente sudo non root
 
-Da <a href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04" target="_blank">Questa Guida</a> di Digital Ocean.
+Da questa guida di DigitalOcean: <Link href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04" />
 
 Una volta eseguito l'accesso ssh creare un utente
 
@@ -110,7 +59,7 @@ usermod -aG sudo nome_utente
 ora è possibile accedere alla droplet con il seguente comando (usando la password specificata quando si è creato l'utente):
 
 ```bash
-ssh nome_utente@your_droplet_ip
+ssh nome_utente@ip_droplet
 ```
 
 ## Creazione chiavi ssh
@@ -125,14 +74,14 @@ ssh-keygen
 per abilitare la chiave sul server usare:
 
 ```bash
-ssh-copy-id nome_utente@your_droplet_ip
+ssh-copy-id nome_utente@ip_droplet
 ```
 
 Ora riaccedere via ssh al server, non dovrebbe più richiedere la password.
 
 ## Firewall (ufw)
 
-Da <a href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04" target="_blank">Questa Guida</a> di Digital Ocean
+Da questa guida di DigitalOcean: <Link href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04" />
 
 Per visualizzare i profili disponibili eseguire:
 
@@ -193,7 +142,7 @@ sudo ufw deny 3000/tcp
 
 ## Installare docker e docker compose
 
-Da <a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04" target="_blank">Questa Guida</a> di Digital Ocean
+Da questa guida di DigitalOcean: <Link href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04" />
 
 Iniziare installando dei pacchetti necessari
 
@@ -260,6 +209,7 @@ docker compose version
 #### Problema:
 
 Sia docker che ufw agiscono sulle iptables e questo risulta in un funzionamento scorretto di entrambi:
+
 - docker potrebbe ritrovarsi delle connessioni (in entrata e in uscita) bloccate
 - ufw potrebbe mostrare uno status che non corrispone alla realtà
 
@@ -286,21 +236,21 @@ Quanto detto funziona solo grazie all'utilizzo di nginx come reverse proxy, il q
 
 **Risorse:**
 
-- Questa soluzione viene da: <a href="https://itnext.io/stay-safe-with-docker-and-firewall-9190d2c0fde8" target="_blank">stay safe with docker and firewall</a>.
+- Questa soluzione viene da: <Link href="https://itnext.io/stay-safe-with-docker-and-firewall-9190d2c0fde8"/>
 
-- <a href="https://github.com/chaifeng/ufw-docker" target="_blank">Quest'altra soluzione</a> sembra più completa, ma è troppo complessa considerando l'utlilizzo di un reverse proxy come in questa guida.
+- Quest'altra soluzione sembra più completa, ma è troppo complessa considerando l'utlilizzo di un reverse proxy come in questa guida: <Link href="https://github.com/chaifeng/ufw-docker" />
 
 Altre risorse per comprendere il problema (ma con soluzioni non realmente funzionanti):
 
-- <a href="https://stackoverflow.com/questions/49549834/ufw-firewall-is-not-working-on-ubuntu-in-digitalocean" target="_blank">https://stackoverflow.com/questions/49549834/ufw-firewall-is-not-working-on-ubuntu-in-digitalocean</a>
-- <a href="https://blog.viktorpetersson.com/2014/11/03/the-dangers-of-ufw-docker.html" target="_blank">https://blog.viktorpetersson.com/2014/11/03/the-dangers-of-ufw-docker.html</a>
-- <a href="https://www.techrepublic.com/article/how-to-fix-the-docker-and-ufw-security-flaw/" target="_blank">https://www.techrepublic.com/article/how-to-fix-the-docker-and-ufw-security-flaw/</a>
+- <Link href="https://stackoverflow.com/questions/49549834/ufw-firewall-is-not-working-on-ubuntu-in-digitalocean" />
+- <Link href="https://blog.viktorpetersson.com/2014/11/03/the-dangers-of-ufw-docker.html" />
+- <Link href="https://www.techrepublic.com/article/how-to-fix-the-docker-and-ufw-security-flaw/" />
 
 ## Nginx
 
-Dovrei provare a mettere nginx come servizio docker, come spiegato in <a href="https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose" target="_blank">Questa Guida</a> di Digital Ocean...
+Dovrei provare a mettere nginx come servizio docker, come spiegato in questa guida di DigitalOcean: <Link href="https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose" />
 
-Intanto per installare nginx uso <a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04" target="_blank">Questa guida</a> e per mettere certbot uso <a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04" target="_blank">Questa</a>.
+Intanto per installare nginx uso <Link href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04">Questa guida</Link> e per mettere certbot uso <Link href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04">Questa.</Link>
 
 Considerando i problemi con docker e il firewall meglio la soluzione attuale.
 
@@ -364,17 +314,17 @@ Per convenzione si creano le configurazioni nella prima cartella e poi per attiv
 
 #### configurazione blocchi server:
 
-Nella cartella sites available aggiungere un file chiamato con il nome del proprio dominio in questo caso `domain_name` senza il .com (o quel che l'è).
+Nella cartella sites available aggiungere un file chiamato con il nome del proprio dominio senza il TLD (.com).
 
 ```bash
-nano /etc/nginx/sites-available/domain_name
+nano /etc/nginx/sites-available/nome_dominio
 ```
 
 Inserire dunque nel file il seguente contenuto:
 
 ```nginx
 server {
-  server_name your_domain.com www.your_domain.com;
+  server_name nome_dominio.tld www.nome_dominio.tld;
 
   location / {
     proxy_pass http://0.0.0.0:3000;
@@ -383,17 +333,18 @@ server {
 
 server {
   listen 80;
-  server_name your_domain.com www.your_domain.com;
+  server_name nome_dominio.tld www.nome_dominio.tld;
 }
 ```
 
 In questo esempio si sta creando un server attivo sulla porta 80 chiamato con il proprio nome dominio (che può anche essere un ip) e lo si sta mappando ad un servizio attivo in localhost sulla porta 3000.
-Così facendo il servizio sulla porta 3000 non sarà disponibile da `your_droplet_ip:3000`ma da`your_droplet_ip` funzionerà
+Così facendo il servizio sulla porta 3000 non sarà disponibile da `ip_droplet:3000`ma da`ip_droplet` funzionerà
 
 Ora per attivare la configurazione questa va linkata nei sites-avalable e va disabilitata la configurazione di default:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/your_domain /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/nome_dominio /etc/nginx/sites-enabled/
+# notare che non viene eliminata da sites-available
 sudo rm /etc/nginx/sites-enabled/default
 ```
 
@@ -433,23 +384,23 @@ In questo caso ho impostato 1GB.
 Pannello di controllo, click sul tasto **Create**, Domains/DNS.
 
 Dalla pagina aperta inserire un dominio in **Enter domain** e premere **Add domain**.
-Il dominio non deve contenere il sottodominio (www)
+Inserire solo il nome dominio e il TLD, senza il sottodominio (www)
 
 <Image src={imgAddDomain} alt="aggiungere un dominio" />
 
 ### Record DNS
 
-Per creare i record DNS premere sul dominio creato e seguire <a href="https://docs.digitalocean.com/products/networking/dns/how-to/manage-records/" target="_blank">Questa Guida</a>
+Per creare i record DNS premere sul dominio creato e seguire questa guida: <Link href="https://docs.digitalocean.com/products/networking/dns/how-to/manage-records/" />
 
 Servono:
 
-- un A record con `nome_dominio` che punta all'IP pubblico del server.
+- un A record con `nome_dominio` (compreso tld) che punta all'IP pubblico del server.
 - An A record per ogni sottodominio (es. `www.nome_dominio`) che punta all'IP pubblico del server.
 - A volte servono anche i record AAAA (per ipv6)
 
 I record A sono dei record che servono a far puntare un dominio a un ip.
 
-Vedere <a href="https://docs.digitalocean.com/products/networking/dns/" target="_blank">Questa Guida</a> di Digital Ocean
+Vedere Questa Guida di DigitalOcean: <Link href="https://docs.digitalocean.com/products/networking/dns/" /> 
 
 Sul provider del proprio dominio configurare i seguenti record NS (name server):
 
@@ -479,7 +430,7 @@ Se lo chiede inserire una mail valida.
 In questa fase è importante che il dns sia configurato e che il dominio sia realmente accessibile
 
 ```bash
-sudo certbot --nginx -d your_domain.com -d www.your_domain.com
+sudo certbot --nginx -d nome_dominio -d www.nome_dominio
 ```
 
 ### Rinnovo automatico
