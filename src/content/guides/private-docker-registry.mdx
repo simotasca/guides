@@ -1,0 +1,184 @@
+---
+title: "Creazione di un registro Docker privato"
+---
+
+## Preparazione
+
+Prima di tutto creare le cartella base contenente un file `docker-compose.yml` e le cartelle per i volumi.
+In questo caso la root sarà `~/docker-registry`.
+
+```bash
+mkdir ~/docker-registry
+cd ~/docker-registry
+mkdir data
+mkdir auth
+touch docker-compose.yml
+```
+
+Il contenuto del `docker-compose.yml`:
+
+```yaml
+version: "3"
+
+services:
+  registry:
+    image: registry:2
+    restart: always
+    ports:
+      - "5001:5000"
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password
+    volumes:
+      - ./data:/data
+      - ./auth:/auth
+```
+
+In breve:
+
+- **image**: l'immagine usata è la registry versione 2 di docker
+- **restart**: impostato a always così che il container si riavvii al riavvio del computer
+- **ports**: utilizzo la porta 5001 su localhost per poi pubblicarla sulla 5000 con Nginx.
+- **environment**: definisco il metodo di autenticazione e specifico le cartelle che uso come volumi
+
+non avviare prima di avviare completare i passaggi segenti
+
+## Nginx
+
+Creare un blocco server in Nginx con la seguente configurazione.
+Non è altro che un reverse proxy con degli header necessari al client docker e un controllo per bloccare le connessioni dalle versioni di docker non supportate (&lt;1.5). `client_max_body_size` impostato a zero consente dimensioni di upload illimitate.
+
+```nginx
+server {
+  listen 5000;
+
+  client_max_body_size 0;
+
+  location / {
+    # Do not allow connections from docker 1.5 and earlier
+    # docker pre-1.6.0 did not properly set the user agent on ping, catch "Go *" user agents
+    if ($http_user_agent ~ "^(docker\/1\.(3|4|5(?!\.[0-9]-dev))|Go ).*$" ) {
+      return 404;
+    }
+
+    proxy_pass                          http://127.0.0.1:5001;
+    proxy_set_header  Host              $http_host;   # required for docker client's sake
+    proxy_set_header  X-Real-IP         $remote_addr; # pass on real client's IP
+    proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header  X-Forwarded-Proto $scheme;
+    proxy_read_timeout                  900;
+  }
+}
+```
+
+Riavviare con:
+
+```bash
+sudo systemctl restart nginx
+```
+
+## Autenticazione (htpasswd)
+
+Per utilizzare htpasswd installare il pacchetto `apache-utils`:
+
+```bash
+sudo apt install apache2-utils -y
+```
+
+Ora spostarsi nella cartella dei volumi `auth`
+
+```bash
+cd ~/docker-registry/auth
+```
+
+E generare una password sostituendo a `{username}` l'username che si vuole utilizzare
+il flag `-B` specifica l'algoritmo bcrypt e `-c` indica di creare un nuovo file con il nome specificato (registry.password)
+
+```bash
+htpasswd -Bc registry.password {username}
+```
+
+Per aggiungere altri username eseguire il comando senza il flag `c` (si aggiunge al file già creato)
+
+```bash
+htpasswd -B registry.password {username}
+```
+
+Questo file è quello specificato nella variabile d'ambiente `REGISTRY_AUTH_HTPASSWD_PATH` del docker-compose.yaml creato all'inizio.
+
+## Avvio e test
+
+### Avvio
+
+A questo punto è possibile avviare il docker compose.
+
+```bash
+cd ~/docker-registry
+docker compose up -d
+```
+
+### Test di avvio
+
+Per testarne il funzionamento fare una chiamata http a `{droplet-ip}:5000/v2` per esempio con:
+
+```bash
+curl localhost:5000/v2
+```
+
+il risultato dovrebbe essere un json vuoto
+
+## Caricamento e download immagini dal registro
+
+Nel caso in cui non sia installato un certificato ssl (per https), dal computer dal quale si vuole eseguire il caricamento si deve configurare l'indirizzo della droplet come registro sicuro per docker.
+
+Per farlo aggiungere questo contenuto nel file `/etc/docker/daemon.json`, sostituendo `registry host` con l'ip della propria droplet:
+
+```json
+{
+  // ...
+  "insecure-registries": ["droplet-ip:5000"]
+  // ...
+}
+```
+
+### Login
+
+Per operare su di un registro occorre prima autenticarsi (sostituire `{registry-domain}` con l'ip della macchina su cui è hostato il registro).
+inserire username e password creati in precedenza quando richiesti.
+
+```bash
+docker login {registry-domain}:5000
+```
+
+### Caricamento
+
+Per effettuare il caricamento, scegliere un'immagine e rinominarla prefissandola con l'indirizzo del registro (sostituire `{test-image}` con il nome dell'immagine che si vuole caricare):
+
+```bash
+docker tag {test-image} {registry-domain}:5000/{test-image}
+```
+
+Il comando `tag` non elimina il vecchio nome dell'immagine, la quale è identificata dall'image id, ma aggiunge un tag, o nome, alla lista dei tag ad essa associati. Eseguendo `docker image ls` si troveranno infatti 2 immagini con tag differente ma con lo stesso id.
+
+A questo punto è possibile fare l'upload dell'immagine con il comando:
+
+```bash
+docker push {registry-domain}:5000/{test-image}
+```
+
+### download
+
+Per scaricare l'immagine eseguire il comando pull:
+
+```bash
+docker pull {registry-domain}:5000/{test-image}
+```
+
+A questo punto se si vuole è possibile rinominare l'immagine dandole un nuovo tag e rimuovendo il tag attuale:
+
+```bash
+docker tag {registry-domain}:5000/{test-image} {new-tag}
+docker rmi {registry-domain}:5000/{test-image}
+```
