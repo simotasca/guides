@@ -157,7 +157,7 @@ docker login {registry-domain}:5000
 Per effettuare il caricamento, scegliere un'immagine e rinominarla prefissandola con l'indirizzo del registro (sostituire `{test-image}` con il nome dell'immagine che si vuole caricare):
 
 ```bash
-docker tag {test-image} {registry-domain}:5000/{test-image}
+docker tag %{test-image}% {registry-domain}:5000/{test-image}
 ```
 
 Il comando `tag` non elimina il vecchio nome dell'immagine, la quale è identificata dall'image id, ma aggiunge un tag, o nome, alla lista dei tag ad essa associati. Eseguendo `docker image ls` si troveranno infatti 2 immagini con tag differente ma con lo stesso id.

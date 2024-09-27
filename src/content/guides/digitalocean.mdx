@@ -448,3 +448,17 @@ sudo certbot renew --dry-run
 ```
 
 Se non ci sono errori il sito sarà accessibile con https e il certificato sarà rinnovato automaticamente
+
+### Altri comandi certbot
+
+Per ottenere una lista dei certificati:
+
+```bash
+certbot certificates
+```
+
+Per eliminare un certificato:
+
+```bash
+certbot delete --cert-name nome_dominio
+```

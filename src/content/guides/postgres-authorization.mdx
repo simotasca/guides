@@ -1,0 +1,171 @@
+---
+title: "Gestione dell'authorization con postgres RLS"
+---
+
+1. ## installare estensioni su docker:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS extensions;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pgjwt SCHEMA extensions;
+```
+
+dockerfile adatto:
+
+```Dockerfile
+FROM postgres:16.1-bullseye
+
+RUN apt update; \
+  apt install git make -y;
+
+RUN git clone https://github.com/michelp/pgjwt; \
+  cd pgjwt; \
+  make install;
+
+RUN mkdir /home/bkp
+```
+
+2. ## creazione del sistema di autenticazione
+
+### schema `auth` e tabella utenti:
+
+il role può essere usato per identificare delle categorie di permessi, mentre email e password saranno usati per l'autenticazione e la generazione del jwt. metadata potrà contenere dati aggiuntivi per ogni utente.
+
+```sql
+CREATE SCHEMA IF NOT EXISTS "auth";
+
+CREATE TABLE "auth"."users" (
+  "id" UUID NOT NULL DEFAULT extensions.uuid_generate_v4() primary key,
+  "email" TEXT NOT NULL,
+  "password" TEXT NOT NULL,
+  "role" TEXT NOT NULL DEFAULT 'basic',
+  "metadata" JSONB DEFAULT '{}',
+);
+```
+
+### funzioni utili
+
+```sql
+create or replace function auth.parse_jwt()
+returns void as $$
+declare
+	token text;
+    valprismaClientid_bool boolean;
+    sub_text text;
+	user_id uuid;
+	user_role text;
+begin
+	select current_setting('request.jwt.token', true) into token;
+
+	if token is null then return; end if;
+
+	select (valid = 'true'), coalesce(payload->>'sub', null)
+	into valid_bool, sub_text
+	from extensions.verify(
+		token := token,
+		secret := 'secreto',
+		algorithm := 'HS256'
+	);
+
+	if not valid_bool then return; end if;
+
+	perform set_config('request.jwt.sub', sub_text, true);
+
+	select id, role from auth.users
+	into user_id, user_role
+	where id::text = sub_text;
+
+	if user_id is null then return; end if;
+
+	perform set_config('request.jwt.user.id', user_id::text, true);
+	perform set_config('request.jwt.user.role', user_role, true);
+exception
+	when others then
+		perform set_config('request.jwt.sub', null, true);
+		perform set_config('request.jwt.user.id', null, true);
+		perform set_config('request.jwt.user.role', null, true);
+		return;
+end;
+$$ language plpgsql;
+```
+
+`auth.parse_jwt()` dovrebbe essere eseguita prima dell'eecuzione di ogni query su database.
+Si occupa di ottenere le informazioni dal valore del token settato nella configurazione `request.jwt.token` che dura solo nell'ambito di una eseguzione di query. questo è utile perchè abilita la verifica dei dati utente in row level security (RLS).
+se il token è valido setta i valori di `request.jwt.user.id` e `request.jwt.user.role` con il payload del token (potrebbe settare anche metadata), altrimenti li imposta a null.
+
+```sql
+CREATE OR REPLACE FUNCTION auth.set_token(token text)
+RETURNS void AS $$
+BEGIN
+    perform set_config('request.jwt.token', token, true);
+    perform auth.parse_jwt();
+END;
+$$ LANGUAGE plpgsql;
+```
+
+`auth.set_token(token text)` è semplicemente un'utility che setta il token in configurazione (il quale dovrebbe essere fornito da chi esegue la query e quindi probabilemente da un cookie) e chiama `auth.parse_jwt()` rendendo operative le utility per la RLS.
+
+```sql
+create or replace function auth.user_id()
+returns text as $$
+begin
+	return (select current_setting('request.jwt.user.id', true));
+end;
+$$ language plpgsql;
+```
+
+la prima delle funzioni per lo sviluppo è `auth.user_id()` utilizzata per ottenere l'id dell'utente. questa è utile per esempio se si volessero legare delle tabelle agli utenti con delle foreign key per poi permettere a ciascun utente di visualizzare solo i dati ad esso legati. esempio: `USING (user.id = company_user.id)`;
+
+```sql
+create or replace function auth.user_role()
+returns text as $$
+begin
+	return (select current_setting('request.jwt.user.role', true));
+end;
+$$ language plpgsql;
+```
+
+`auth.user_id()` serve invece per ottenere il role dell'utente autenticato. utile sempre in RLS.
+
+3. ## Esempio con Prisma ORM
+
+per far si che prisma configuri sempre il token a ogni query:
+
+```typescript
+import { Prisma, PrismaClient } from "@prisma/client";
+
+const prismaBase = new PrismaClient({
+  datasourceUrl: DATABASE_URL,
+});
+
+export function prismaClient(token: string = "") {
+  return prismaBase.$extends(
+    Prisma.defineExtension((prisma) =>
+      prisma.$extends({
+        query: {
+          $allModels: {
+            async $allOperations({ args, query }) {
+              const [, result] = await prisma.$transaction([
+                prisma.$executeRaw`select auth.set_token(${token})`,
+                query(args),
+              ]);
+              return result;
+            },
+          },
+        },
+      })
+    )
+  );
+}
+
+export type Prisma = ReturnType<typeof prismaClient>;
+```
+
+semplicemente non si utilizzerà più un client preimpostato, ovvero il prismaBase, bensì ad ogni richiesta il server creerà un nuovo client che prima di ogni operazione setterà il token con la `auth.set_token` in modo tale da autenticare la richiesta.
+
+4. ## Logica
+
+per come l'ho descritto non può proprio essere eseguito lato client.
+
+se si vuole dare accesso al client serve... non ricordo più sta parte... vedere postgREST e cose correlate**.**
