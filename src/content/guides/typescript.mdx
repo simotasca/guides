@@ -1,0 +1,21 @@
+---
+title: "Typescript"
+---
+
+## Function assertions
+
+una funzione può fare delle asserzioni sui parametri di input con questa sintassi:
+
+```Typescript
+function checkValid(input: InputType): input is ExtendedInputType;
+```
+
+dove `ExtendedInputType` è un tipo che estende `InputType`.
+
+Un esempio pratico di questa funzionalità è nella funzione `Array.prototype.filer`
+
+```Typescript
+const cose = ["sasso", null, "ruota", "fronte", null, "pianeta", null];
+const filtered: string[] = cose.filter(c => !!c); // Type Error: '(string | null)[]' is not assignable to type 'string[]'.
+const filtered: string[] = cose.filter((c): c is string => !!c); // questo funziona
+```

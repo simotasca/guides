@@ -1,0 +1,84 @@
+---
+title: "Gestione branch in git"
+---
+
+## Azioni basilari
+
+### list branches
+
+```bash
+git branch -l
+```
+
+### create branch
+
+```bash
+git branch <branch-name>
+```
+
+### switch current branch
+
+```bash
+git switch <branch-name>
+```
+
+### push the branch to github
+
+```bash
+git push origin <branch-name>
+```
+
+### push on a branch
+
+```bash
+git push origin <branch-name>
+```
+
+### delete local branch
+
+```bash
+git branch -d <branch-name>
+```
+
+### delete remote branch
+
+```bash
+git push origin --delete <branch-name>
+```
+
+### merge:
+
+esegue la merge del branch specificato sul branch corrente
+
+```bash
+git merge <branch-name>
+```
+
+## Nomenclatura
+
+- ultima versione: master
+- versionamento: v0.0.0
+- sviluppo in corso: dev
+- singoli sviluppi: feature/branch-name (da meurgiare su dev)
+
+## Procedure:
+
+### Sviluppo feature
+
+- create branch `git branch <feature/branch-name>`
+- switch current branch: `git switch <feature/branch-name>`
+- push the branch to github: `git push origin <feature/branch-name>`
+- push on the branch: `git push origin <feature/branch-name>`
+- back to master: `git switch master`
+- pull master: `git pull origin master`
+- merge: `git merge <feature/branch-name>`
+- delete local branch: `git branch -d <feature/branch-name>`
+- delete remote branch: `git push origin --delete <feature/branch-name>`
+
+### Versionamento
+
+- list branches: `git branch -l`
+- create branch `git branch <branch-name>`
+- switch current branch: `git switch <branch-name>`
+- push the branch to github: `git push origin <branch-name>`
+- back to master: `git switch master`
