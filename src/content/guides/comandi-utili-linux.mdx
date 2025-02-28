@@ -40,13 +40,18 @@ exit
 ### Creazione di un archivio tar
 ```bash
 # -c(ompress) -z (gzip) -v(erbose) -f(ile name)
-tar -czvf archive_name.tar.gz ./file1 ./file2 ./file3
+tar -czvf file.tar.gz ./file1 ./file2 ./file3
 ```
 
 ### Estrazione di un archivio tar
 ```bash
 # -x (extract) -z (gzip) -v(erbose) -f(ile name)
-tar -xzvf archive_name.tar.gz
+tar -xzvf file.tar.gz
+```
+
+### Visualizzazione contenuti di un archivio tar
+```bash
+tar -tvf file.tar.gz
 ```
 
 ## ssh
