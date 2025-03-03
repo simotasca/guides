@@ -1,0 +1,23 @@
+---
+title: "Creazione .gitignore e cartella privati per git"
+---
+
+source: https://medium.com/@peter_graham/how-to-create-a-local-gitignore-1b19f083492b
+
+Eseguire questo comando per aprire in un editor le configurazioni della cartella git corrente:
+
+```bash
+git config --local -e
+```
+
+Nel file aggiungere nella sezione `[core]` la riga:
+
+```
+excludesfile = cartella_privata/.gitignore
+```
+
+Ora il file `./cartella_privata/.gitignore` avrà valenza come .gitignore della root del progetto. Dunque potrà essere usato per ignorare sé stesso e la cartella, scrivendo al suo interno:
+
+```
+./cartella_privata/.gitignore
+```
