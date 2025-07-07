@@ -21,3 +21,23 @@ Ora il file `./cartella_privata/.gitignore` avrà valenza come .gitignore della 
 ```
 ./cartella_privata/.gitignore
 ```
+
+## Automazione
+
+Per far tutto in modo automatico eseguire questi script nel terminale:
+
+(OPZIONALE) definire il nome della cartella privata (default: `.private` se non impostato):
+```bash
+export PRIVATE_FOLDER="cartella_privata"
+```
+
+poi eseguire:
+```bash
+PRIVATE_FOLDER="${PRIVATE_FOLDER:-.private}" && \
+GITIGNORE_PATH="$PRIVATE_FOLDER/.gitignore" && \
+git rev-parse --is-inside-work-tree > /dev/null 2>&1 || { echo "❌ Not a Git repo. Run this inside a repo."; return 1 2>/dev/null || exit 0; } && \
+mkdir -p "$PRIVATE_FOLDER" && \
+[ -f "$GITIGNORE_PATH" ] || echo "$GITIGNORE_PATH" > "$GITIGNORE_PATH" && \
+git config --local --get core.excludesfile | grep -q "$GITIGNORE_PATH" || git config --local core.excludesfile "$GITIGNORE_PATH" && \
+echo "✅ Done. Local .gitignore set to: $GITIGNORE_PATH"
+```
