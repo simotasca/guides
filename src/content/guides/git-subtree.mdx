@@ -1,0 +1,44 @@
+---
+title: "Gestione branch in git"
+---
+
+guida: https://www.atlassian.com/git/tutorials/git-subtree
+
+## Come funziona
+
+Permette di gestire repository git all'interno di un'altra repository.
+
+I commit sono condivisi tra repo principale e subtree, ma quando sono pushati su un subtree i file vengono filtrati per contenere solo quelli relativi ad esso.
+
+## Workflow
+
+### 1. Remote
+
+aggiungere l'url della repository ai remote.
+`-f` indica il nome che verrà usato come alias per quel remote.
+
+```bash
+git remote add -f demo-origin git@github.com:user/demo.git
+```
+
+### 2. Add
+
+Per fare la clone della repository con subtree si usa `add`, specificando in che cartella clonare i file, da che origin e da che branch.
+`--squash` serve per scaricare solo l'ultimo commit. 
+
+```bash
+git subtree add --prefix ./project/sub/folder demo-origin branch --squash
+```
+
+### 3. Pull
+
+```bash
+# git fetch demo-origin branch (se serve)
+git subtree pull --prefix ./project/sub/folder demo-origin branch --squash
+```
+
+### 4. Push
+
+```bash
+git subtree push --prefix ./project/sub/folder demo-origin branch
+```
